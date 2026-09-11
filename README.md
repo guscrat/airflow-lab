@@ -1,7 +1,7 @@
 # airflow-lab
 
 Projeto de estudos de Apache Airflow, usado para orquestrar o pipeline do
-projeto [`DBT-Fundamentals---Jaffle-Shop`](../dbt_project/DBT-Fundamentals---Jaffle-Shop)
+projeto [`DBT-Fundamentals---Jaffle-Shop`](https://github.com/guscrat/DBT-Fundamentals---Jaffle-Shop)
 (dbt + DuckDB). Aqui o foco é aprender Airflow em si — o DAG apenas chama, via
 `BashOperator`, os mesmos comandos que já são rodados manualmente naquele
 projeto dbt.
@@ -69,4 +69,4 @@ uv run airflow dags trigger jaffle_shop_pipeline
 ## Resources
 
 - [Documentação do Airflow](https://airflow.apache.org/docs/)
-- Projeto dbt orquestrado: `DBT-Fundamentals---Jaffle-Shop`
+- Projeto dbt orquestrado: [`DBT-Fundamentals---Jaffle-Shop`](https://github.com/guscrat/DBT-Fundamentals---Jaffle-Shop)
