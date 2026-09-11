@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Airflow runtime/metadata
+airflow.cfg
+airflow.db
+airflow.db-shm
+airflow.db-wal
+logs/
+simple_auth_manager_passwords.json.generated
+
+# Env
+.env
