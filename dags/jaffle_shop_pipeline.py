@@ -24,7 +24,7 @@ with DAG(
     schedule="@daily",
     catchup=False,
     default_args=default_args,
-    tags=["dbt", "duckdb", "jaffle_shop"],
+    tags=["dbt", "bigquery", "jaffle_shop"],
 ) as dag:
 
     load_raw = BashOperator(

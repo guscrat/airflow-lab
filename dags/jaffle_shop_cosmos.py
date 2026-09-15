@@ -14,7 +14,7 @@ def alerta_falha(context):
 
 
 profile_config = ProfileConfig(
-    profile_name="default",
+    profile_name="jaffle_shop",
     target_name="dev",
     profiles_yml_filepath=PROFILES_YML,
 )
@@ -35,7 +35,7 @@ with DAG(
     schedule="@daily",
     catchup=False,
     default_args=default_args,
-    tags=["dbt", "duckdb", "cosmos"],
+    tags=["dbt", "bigquery", "cosmos"],
 ) as dag:
 
     load_raw = BashOperator(
@@ -48,7 +48,6 @@ with DAG(
         project_config=ProjectConfig(DBT_PROJECT_DIR),
         profile_config=profile_config,
         execution_config=execution_config,
-        operator_args={"pool": "duckdb_pool"},
     )
 
     load_raw >> transform
