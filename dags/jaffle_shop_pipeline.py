@@ -1,7 +1,13 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+DBT_PROJECT_DIR = os.environ.get("DBT_PROJECT_DIR")
 
 def alerta_falha(context):
     ti = context["ti"]
@@ -29,17 +35,17 @@ with DAG(
 
     load_raw = BashOperator(
         task_id="load_raw",
-        bash_command="cd {{ var.value.dbt_project_dir }} && uv run python load_raw.py",
+        bash_command=f"cd {DBT_PROJECT_DIR} && uv run python load_raw.py",
     )
 
     dbt_run = BashOperator(
         task_id="dbt_run",
-        bash_command="cd {{ var.value.dbt_project_dir }} && uv run dbt run",
+        bash_command=f"cd {DBT_PROJECT_DIR} && uv run dbt run",
     )
 
     dbt_test = BashOperator(
         task_id="dbt_test",
-        bash_command="cd {{ var.value.dbt_project_dir }} && uv run dbt test",
+        bash_command=f"cd {DBT_PROJECT_DIR} && uv run dbt test",
     )
 
-    load_raw >> dbt_run >> dbt_test
+    load_raw >> dbt_run >> dbt_test # type: ignore

@@ -1,9 +1,15 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
 
-DBT_PROJECT_DIR = "/home/guscrat/Documents/projetos/dbt_project/DBT-Fundamentals---Jaffle-Shop"
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+DBT_PROJECT_DIR = os.environ.get("DBT_PROJECT_DIR")
 DBT_EXECUTABLE = f"{DBT_PROJECT_DIR}/.venv/bin/dbt"
 PROFILES_YML = "/home/guscrat/.dbt/profiles.yml"
 

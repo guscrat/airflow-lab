@@ -1,7 +1,7 @@
 # airflow-lab
 
 Projeto de estudos de Apache Airflow, usado para orquestrar o pipeline do
-projeto [`DBT-Fundamentals---Jaffle-Shop`](https://github.com/guscrat/DBT-Fundamentals---Jaffle-Shop)
+projeto [`jaffle-shop-analytics-bigquery`](https://github.com/guscrat/jaffle-shop-analytics-bigquery)
 (dbt + BigQuery). Aqui o foco é aprender Airflow em si — os DAGs apenas chamam
 os mesmos comandos que já são rodados manualmente naquele projeto dbt.
 
@@ -93,4 +93,4 @@ uv run airflow dags trigger jaffle_shop_cosmos
 ## Resources
 
 - [Documentação do Airflow](https://airflow.apache.org/docs/)
-- Projeto dbt orquestrado: [`DBT-Fundamentals---Jaffle-Shop`](https://github.com/guscrat/DBT-Fundamentals---Jaffle-Shop)
+- Projeto dbt orquestrado: [`jaffle-shop-analytics-bigquery`](https://github.com/guscrat/jaffle-shop-analytics-bigquery)

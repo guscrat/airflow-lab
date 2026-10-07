@@ -1,0 +1,17 @@
+[project]
+name = "airflow-lab"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "guscrat", email = "gustavoapostolic@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "apache-airflow>=3.3.2",
+    "astronomer-cosmos>=1.15.1",
+    "graphviz>=0.21",
+]
+
+[tool.uv]
+package = false
