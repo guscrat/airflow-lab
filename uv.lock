@@ -52,6 +52,7 @@ dependencies = [
     { name = "apache-airflow" },
     { name = "astronomer-cosmos" },
     { name = "graphviz" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
@@ -59,6 +60,7 @@ requires-dist = [
     { name = "apache-airflow", specifier = ">=3.3.2" },
     { name = "astronomer-cosmos", specifier = ">=1.15.1" },
     { name = "graphviz", specifier = ">=0.21" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
 ]
 
 [[package]]
