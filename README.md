@@ -42,53 +42,88 @@ dele).
 
 ## Setup
 
-### 1. Instalar as dependências
+O ambiente roda **exclusivamente via Docker Compose** — não há mais execução
+direta na máquina (standalone). Isso mantém o setup igual em qualquer SO
+(Windows, Linux ou macOS), que foi o motivo da migração: o fluxo antigo
+dependia de shell POSIX e do Airflow instalado localmente e quebrava no
+Windows.
+
+Pré-requisito: Docker Desktop (ou Docker Engine + Compose) instalado e com
+pelo menos ~4 GB de memória disponíveis para o Docker.
+
+### 1. Subir o ambiente
+
+A partir da raiz deste repositório:
 
 ```bash
-uv sync
+docker compose up -d
 ```
 
-### 2. Ajustar o `AIRFLOW_HOME`
+O `docker-compose.yaml` é a configuração oficial do Apache Airflow
+(CeleryExecutor + PostgreSQL + Redis). Na primeira vez, o serviço
+`airflow-init` roda a migração do banco de metadados e cria o usuário admin
+antes dos demais serviços subirem.
 
-O Airflow usa o diretório atual como `AIRFLOW_HOME` por padrão (`airflow.cfg`,
-`airflow.db`, `logs/` já estão aqui). Rode os comandos sempre a partir da raiz
-deste repositório, ou exporte:
+### 2. Acessar a UI
 
-```bash
-export AIRFLOW_HOME=$(pwd)
-```
+A UI web fica em **`http://localhost:8081`** (o compose mapeia a porta interna
+`8080` para `8081` no host). Usuário e senha padrão são `airflow` / `airflow`.
 
-### 3. Subir o Airflow (standalone)
-
-```bash
-uv run airflow standalone
-```
-
-Isso inicializa o banco de metadados, cria um usuário admin e sobe o
-scheduler + a UI web (por padrão em `http://localhost:8080`). O usuário e
-senha gerados aparecem no log de saída (também salvos em
-`simple_auth_manager_passwords.json.generated`).
-
-### 4. Rodar o DAG
+### 3. Rodar o DAG
 
 Pela UI, ative o DAG desejado (`jaffle_shop_pipeline` ou `jaffle_shop_cosmos`)
-e dispare uma execução manual, ou via CLI:
+e dispare uma execução manual, ou via CLI dentro do container:
 
 ```bash
-uv run airflow dags trigger jaffle_shop_pipeline
+docker compose run --rm airflow-cli dags trigger jaffle_shop_pipeline
 # ou
-uv run airflow dags trigger jaffle_shop_cosmos
+docker compose run --rm airflow-cli dags trigger jaffle_shop_cosmos
 ```
+
+### 4. Derrubar o ambiente
+
+```bash
+docker compose down
+# para apagar também o banco de metadados (volume do Postgres):
+docker compose down -v
+```
+
+## ⚠️ Pendências para o pipeline rodar de ponta a ponta
+
+O Compose já sobe o Airflow e carrega os DAGs deste repositório, **mas o
+pipeline ainda não executa de ponta a ponta** — o `docker-compose.yaml` é o
+oficial da Apache, sem as customizações específicas deste projeto. Falta
+configurar:
+
+1. **Montar o projeto dbt no container.** O caminho em `DBT_PROJECT_DIR` aponta
+   para uma pasta *fora* deste repositório; dentro do container esse caminho
+   não existe. É preciso adicionar um volume (ex.: via `AIRFLOW_PROJ_DIR` ou um
+   mount dedicado) expondo o projeto dbt para os serviços.
+2. **Instalar as dependências do pipeline.** A imagem `apache/airflow` não traz
+   o [Astronomer Cosmos](https://astronomer.github.io/astronomer-cosmos/) nem o
+   `dbt-bigquery`. Usar `_PIP_ADDITIONAL_REQUIREMENTS` (apenas para testes
+   rápidos) ou estender a imagem via `build:` (recomendado).
+3. **Prover as credenciais do GCP.** Montar a service account e apontar
+   `GOOGLE_APPLICATION_CREDENTIALS` (ou o `profiles.yml` do dbt) para dentro do
+   container, de modo que as tasks consigam acessar o BigQuery.
+4. **Desligar os DAGs de exemplo.** Trocar
+   `AIRFLOW__CORE__LOAD_EXAMPLES` para `'false'` para não poluir a UI com os
+   DAGs de demonstração do Airflow.
+
+Esses ajustes serão feitos conforme o projeto dbt for validado.
 
 ## Estrutura
 
+- `docker-compose.yaml` — ambiente do Airflow (CeleryExecutor + PostgreSQL +
+  Redis), base oficial da Apache.
 - `dags/jaffle_shop_pipeline.py` — DAG sequencial (`BashOperator` chamando
   `dbt run`/`dbt test`).
 - `dags/jaffle_shop_cosmos.py` — DAG com Cosmos, paralelizando as tasks de
   transformação do dbt.
-- `airflow.cfg`, `airflow.db*` — configuração e metadados locais do Airflow
-  (não versionados).
-- `logs/` — logs de execução das tasks (não versionado).
+- `config/`, `plugins/` — montados nos containers (`/opt/airflow/config` e
+  `/opt/airflow/plugins`).
+- `logs/` — logs de execução das tasks, montado nos containers (não
+  versionado).
 
 ## Resources
 
